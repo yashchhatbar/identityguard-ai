@@ -1,10 +1,7 @@
-const API = import.meta.env.VITE_API_BASE_URL;
+// ✅ Base URL from environment
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-fetch(`${API}/face/upload`, {
-  method: "POST",
-  body: formData,
-});
-
+// 🔥 Generic response parser
 async function parseResponse(response) {
     const requestId = response.headers.get("x-request-id");
 
@@ -18,7 +15,7 @@ async function parseResponse(response) {
     if (!response.ok) {
         let message = "Request failed";
 
-        // 🔥 Handle FastAPI validation errors properly
+        // Handle FastAPI validation errors
         if (payload?.errors) {
             message = payload.errors.map((err) => err.msg || err.message).join(", ");
         } else if (Array.isArray(payload?.detail)) {
@@ -31,7 +28,7 @@ async function parseResponse(response) {
 
         const error = new Error(message);
         error.requestId = requestId;
-        error.code = payload.code;
+        error.code = payload?.code;
 
         console.error("API ERROR:", {
             requestId,
@@ -45,6 +42,7 @@ async function parseResponse(response) {
     return { ...payload, requestId };
 }
 
+// 🔥 Main API request function
 export async function apiRequest(path, options = {}) {
     const response = await fetch(`${API_BASE_URL}${path}`, {
         credentials: "include",
@@ -54,4 +52,16 @@ export async function apiRequest(path, options = {}) {
     return parseResponse(response);
 }
 
+// 🔥 Helper for file upload (VERY IMPORTANT for your app)
+export async function uploadFile(path, formData) {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+    });
+
+    return parseResponse(response);
+}
+
+// Export base URL if needed
 export { API_BASE_URL };
