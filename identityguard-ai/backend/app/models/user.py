@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import DateTime, Index, String, func
+from sqlalchemy import DateTime, Index, String, Integer, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -18,6 +19,11 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(String(20), default="user", nullable=False, index=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    # 🔥 FREE TIER FIELDS
+    plan: Mapped[str] = mapped_column(String(20), default="free")
+    usage_count: Mapped[int] = mapped_column(Integer, default=0)
+    last_reset: Mapped[DateTime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
 
     face_embeddings = relationship(
         "FaceEmbedding",
