@@ -1,5 +1,9 @@
-const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+const API = import.meta.env.VITE_API_BASE_URL;
+
+fetch(`${API}/face/upload`, {
+  method: "POST",
+  body: formData,
+});
 
 async function parseResponse(response) {
     const requestId = response.headers.get("x-request-id");
