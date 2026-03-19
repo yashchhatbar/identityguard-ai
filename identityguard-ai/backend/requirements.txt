@@ -1,8 +1,8 @@
-fastapi
-uvicorn[standard]==0.30.0
+fastapi[all]
+uvicorn==0.30.0
 
 # AI
-deepface
+deepface==0.0.99
 tensorflow-cpu==2.12.0
 opencv-python-headless
 numpy
