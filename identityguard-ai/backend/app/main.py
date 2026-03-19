@@ -44,7 +44,10 @@ async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
     with session_scope() as session:
         AuthService.bootstrap_admin(session)
-    FaceEngine.warmup()
+    try:
+        FaceEngine.warmup()
+    except Exception as e:
+        logger.warning(f"AI warmup skipped: {e}")
     yield
 
 
@@ -61,7 +64,7 @@ if SLOWAPI_AVAILABLE:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=["*"],  # ✅ for deployment (later restrict)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -157,9 +160,12 @@ def root():
 def api_health():
     database_status = "disconnected"
 
-    with engine.connect() as connection:
-        connection.execute(text("SELECT 1"))
-        database_status = "connected"
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+            database_status = "connected"
+    except Exception:
+        database_status = "disconnected"
 
     uptime_seconds = int((datetime.now(timezone.utc) - STARTED_AT).total_seconds())
 
