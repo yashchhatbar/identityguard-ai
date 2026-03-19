@@ -41,13 +41,43 @@ STARTED_AT = datetime.now(timezone.utc)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    # ✅ Create tables
     Base.metadata.create_all(bind=engine)
 
+    # 🔥 AUTO DB SCHEMA UPDATE (FREE TIER SUPPORT)
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN plan VARCHAR DEFAULT 'free'"))
+        except Exception:
+            pass
+
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN usage_count INTEGER DEFAULT 0"))
+        except Exception:
+            pass
+
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN last_reset TIMESTAMP"))
+        except Exception:
+            pass
+
+        # ✅ Fix NULL values (important)
+        try:
+            conn.execute(text("UPDATE users SET plan='free' WHERE plan IS NULL"))
+        except Exception:
+            pass
+
+        try:
+            conn.execute(text("UPDATE users SET usage_count=0 WHERE usage_count IS NULL"))
+        except Exception:
+            pass
+
+    # ✅ Bootstrap admin
     with session_scope() as session:
         AuthService.bootstrap_admin(session)
 
     # 🔥 Avoid timeout in Render
-    if settings.ENVIRONMENT != "production":
+    if settings.environment != "production":
         try:
             FaceEngine.warmup()
         except Exception as e:
