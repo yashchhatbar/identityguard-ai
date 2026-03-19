@@ -15,7 +15,7 @@ def _split_origins(raw: str) -> list[str]:
 @dataclass
 class Settings:
     app_name: str = os.getenv("APP_NAME", "IdentityGuard API")
-    environment: str = os.getenv("ENVIRONMENT", "development")
+    environment: str = os.getenv("ENVIRONMENT", "development")  # ✅ already correct
     secret_key: str = os.getenv("SECRET_KEY", os.getenv("JWT_SECRET_KEY", "dev-secret-change-me"))
     jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
     access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
@@ -33,6 +33,11 @@ class Settings:
     admin_email: str = os.getenv("ADMIN_EMAIL", "admin@identityguard.ai")
     admin_password: str = os.getenv("ADMIN_PASSWORD", "Admin12345!")
     upload_dir: str = os.getenv("UPLOAD_DIR", str(DEFAULT_UPLOAD_DIR))
+
+    # 🔥 ADD THIS (FIX)
+    @property
+    def ENVIRONMENT(self) -> str:
+        return self.environment
 
     def __post_init__(self):
         self.allowed_origins = _split_origins(
