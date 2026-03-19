@@ -42,12 +42,19 @@ STARTED_AT = datetime.now(timezone.utc)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+
     with session_scope() as session:
         AuthService.bootstrap_admin(session)
-    try:
-        FaceEngine.warmup()
-    except Exception as e:
-        logger.warning(f"AI warmup skipped: {e}")
+
+    # 🔥 Avoid timeout in Render
+    if settings.ENVIRONMENT != "production":
+        try:
+            FaceEngine.warmup()
+        except Exception as e:
+            logger.warning(f"AI warmup skipped: {e}")
+    else:
+        logger.info("Skipping AI warmup in production")
+
     yield
 
 
