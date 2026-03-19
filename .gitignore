@@ -1,4 +1,6 @@
+# ------------------------
 # Python
+# ------------------------
 __pycache__/
 *.pyc
 *.pyo
@@ -8,31 +10,53 @@ env/
 venv/
 .env/
 .venv/
-env.bak/
-venv.bak/
 
+# ------------------------
 # Node
+# ------------------------
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 dist/
 dist-ssr/
-*.local
+.vite/
 
-# macOS
+# ------------------------
+# Logs
+# ------------------------
+*.log
+
+# ------------------------
+# OS
+# ------------------------
 .DS_Store
+Thumbs.db
 
-# Temporary files
+# ------------------------
+# Temp
+# ------------------------
 *.swp
 *.bak
 *~
 
-# Test Cache
+# ------------------------
+# Testing
+# ------------------------
 .pytest_cache/
+.cache/
 
-# SQLite
-*.db
+# ------------------------
+# Database (IMPORTANT)
+# ------------------------
+# Uncomment if you DON'T want DB in GitHub
+# *.db
 
-# Logs
-*.log
+# ------------------------
+# Uploads (VERY IMPORTANT)
+# ------------------------
+uploads/
+app/uploads/
+
+# ------------------------
+# IDE
+# ------------------------
+.vscode/
+.idea/
