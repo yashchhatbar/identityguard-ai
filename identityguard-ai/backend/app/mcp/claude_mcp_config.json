@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "identityguard": {
+      "command": "python",
+      "args": ["-m", "app.mcp.mcp_server"],
+      "cwd": "/Users/yash/Downloads/My Resume/face_de_duplication copy 2/identityguard-ai/backend"
+    }
+  }
+}

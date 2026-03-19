@@ -1,0 +1,10 @@
+streamlit
+facenet-pytorch
+torch
+torchvision
+scikit-learn
+deepface
+tf-keras
+pillow
+opencv-python
+tqdm
