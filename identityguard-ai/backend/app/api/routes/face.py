@@ -7,6 +7,7 @@ from app.api.deps import get_current_user, require_role
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.responses import success_response
+from app.core.usage_limit import check_usage  # 🔥 NEW
 from app.models.user import User
 from app.schemas.face import FaceUploadResponse, FaceVerifyResponse
 from app.security.limiter import limiter
@@ -24,6 +25,10 @@ async def upload_face(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("user", "admin")),
 ):
+    # 🔥 CHECK FREE TIER
+    check_usage(current_user)
+    db.commit()
+
     try:
         result = await FaceService.store_face_upload(
             db=db,
@@ -40,7 +45,7 @@ async def upload_face(
     )
 
 
-# 🔥 NEW FEATURE: URL UPLOAD
+# 🔥 URL UPLOAD
 @router.post("/upload-url", response_model=dict)
 @limiter.limit("6/minute")
 async def upload_face_url(
@@ -50,6 +55,10 @@ async def upload_face_url(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("user", "admin")),
 ):
+    # 🔥 CHECK FREE TIER
+    check_usage(current_user)
+    db.commit()
+
     try:
         response = requests.get(url, timeout=10)
 
@@ -88,6 +97,10 @@ async def verify_face(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("user", "admin")),
 ):
+    # 🔥 CHECK FREE TIER
+    check_usage(current_user)
+    db.commit()
+
     try:
         result = await FaceService.verify_face(
             db=db,
