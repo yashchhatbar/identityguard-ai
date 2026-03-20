@@ -1,3 +1,4 @@
+# 🔥 SAME IMPORTS (no change)
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from time import perf_counter
@@ -41,42 +42,34 @@ STARTED_AT = datetime.now(timezone.utc)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # ✅ Create tables
     Base.metadata.create_all(bind=engine)
 
-    # 🔥 AUTO DB SCHEMA UPDATE (FREE TIER SUPPORT)
     with engine.connect() as conn:
         try:
             conn.execute(text("ALTER TABLE users ADD COLUMN plan VARCHAR DEFAULT 'free'"))
-        except Exception:
+        except:
             pass
-
         try:
             conn.execute(text("ALTER TABLE users ADD COLUMN usage_count INTEGER DEFAULT 0"))
-        except Exception:
+        except:
             pass
-
         try:
             conn.execute(text("ALTER TABLE users ADD COLUMN last_reset TIMESTAMP"))
-        except Exception:
+        except:
             pass
 
-        # ✅ Fix NULL values (important)
         try:
             conn.execute(text("UPDATE users SET plan='free' WHERE plan IS NULL"))
-        except Exception:
+        except:
             pass
-
         try:
             conn.execute(text("UPDATE users SET usage_count=0 WHERE usage_count IS NULL"))
-        except Exception:
+        except:
             pass
 
-    # ✅ Bootstrap admin
     with session_scope() as session:
         AuthService.bootstrap_admin(session)
 
-    # 🔥 Avoid timeout in Render
     if settings.environment != "production":
         try:
             FaceEngine.warmup()
@@ -99,16 +92,19 @@ app.state.limiter = limiter
 if SLOWAPI_AVAILABLE:
     app.add_middleware(SlowAPIMiddleware)
 
+# ✅🔥 FIXED CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ✅ for deployment (later restrict)
+    allow_origins=[
+        "http://localhost:5173",
+        "https://identityguard-ai.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# 🔥 REQUEST + METRICS MIDDLEWARE
 @app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
     started = perf_counter()
@@ -147,7 +143,6 @@ async def request_logging_middleware(request: Request, call_next):
         reset_request_id(token)
 
 
-# 🔥 CLEAN ERROR HANDLING
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(_, exc: StarletteHTTPException):
     return JSONResponse(
@@ -184,7 +179,6 @@ async def unhandled_exception_handler(_, exc: Exception):
     )
 
 
-# 🔥 ROUTES
 app.include_router(api_router, prefix="/api")
 
 
@@ -201,7 +195,7 @@ def api_health():
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
             database_status = "connected"
-    except Exception:
+    except:
         database_status = "disconnected"
 
     uptime_seconds = int((datetime.now(timezone.utc) - STARTED_AT).total_seconds())
