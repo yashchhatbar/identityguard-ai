@@ -84,13 +84,13 @@ export default function Register() {
                         name: "name",
                         type: "text",
                         label: "Full name",
-                        placeholder: "Aarav Sharma",
+                        placeholder: "Yash Chhatbar",
                     },
                     {
                         name: "email",
                         type: "email",
                         label: "Email",
-                        placeholder: "aarav@identityguard.ai",
+                        placeholder: "yash@identityguard.ai",
                     },
                     {
                         name: "password",
